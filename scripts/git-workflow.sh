@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Continuous Git Commit Script
+echo "🚀 Starting continuous Git workflow..."
+
+commit_and_push() {
+    local message="$1"
+    git add .
+    
+    if git diff --staged --quiet; then
+        echo "📝 No changes to commit"
+        return 0
+    fi
+    
+    git commit -m "$message"
+    
+    if git remote get-url origin >/dev/null 2>&1; then
+        echo "📤 Pushing to GitHub..."
+        git push origin main
+        echo "✅ Successfully pushed to GitHub"
+    else
+        echo "⚠️  Setup GitHub remote first:"
+        echo "   git remote add origin https://github.com/yourusername/TaskManager.git"
+        echo "   git push -u origin main"
+    fi
+}
+
+case "${1:-auto}" in
+    "setup")
+        echo "🔧 GitHub Setup Instructions:"
+        echo "1. Create repository: https://github.com/new"
+        echo "2. Repository name: TaskManager"
+        echo "3. Run: git remote add origin https://github.com/yourusername/TaskManager.git"
+        echo "4. Run: git push -u origin main"
+        ;;
+    "auto")
+        commit_and_push "Auto-commit: $(date '+%Y-%m-%d %H:%M:%S')"
+        ;;
+    *)
+        commit_and_push "$1"
+        ;;
+esac
